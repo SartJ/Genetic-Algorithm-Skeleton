@@ -53,11 +53,16 @@ def fitness(population, n):
   j = 0
   while j < len(population):  # repeating for each individual
     attacking_pairs = 0     #total number of attacking queen pairs
+    diagonal_pairs = 0  #no. of diagonal pairs
     for i,val in enumerate(population[j]):    # i = index of individual list , val = individual position
-      attacking_pairs += math.comb(population[j].count(val),2) #finding no. of horizontal attacking pairs
-      if abs(i-j) == abs(population[i]-population[j]):  #finding no. of diagonal attacking pairs
-        attacking_pairs += 1
-    fit_score.append(attacking_pairs) 
+      attacking_pairs += math.comb(population[j].count(val),2) #finding no. of horizontal attacking pairs, using nC2 combination formula
+      
+      if i!=j:
+        if abs(i-j) == abs(population[i]-population[j]):  #finding no. of diagonal attacking pairs
+          diagonal_pairs += 1
+    if diagonal_pairs!=0:     #dealing with duplicate values
+      diagonal_pairs = diagonal_pairs/2
+    fit_score.append(attacking_pairs+diagonal_pairs) 
     j += 1
     
 
