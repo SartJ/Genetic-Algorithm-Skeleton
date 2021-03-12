@@ -41,37 +41,75 @@ $$
 
 import numpy as np
 import math
+import random
 
 """### Fitness function"""
+
+# def fitness(population, n):
+
+#   '''calculates the fitness score of each
+#      of the individuals in the population'''
+     
+#   fit_score = [] # list to contain fitness score of each individuals
+#   j = 0
+#   while j < len(population):  # repeating for each individual
+#     attacking_pairs = 0     #total number of attacking queen pairs
+#     diagonal_pairs = 0  #no. of diagonal pairs
+#     for i,val in enumerate(population[j]):    # i = index of individual list , val = individual position
+#       if population[j].count(val) > 1 :
+#         attacking_pairs += math.comb(population[j].count(val),2) #finding no. of horizontal attacking pairs, using nC2 combination formula
+      
+#       if i!=j:
+#         if abs(i-j) == abs(population[i]-population[j]):  #finding no. of diagonal attacking pairs
+#           diagonal_pairs += 1
+#     if diagonal_pairs!=0:     #dealing with duplicate values
+#       diagonal_pairs = diagonal_pairs/2
+#     fit_score.append(attacking_pairs+diagonal_pairs) 
+#     j += 1
+    
+
+#   '''returns a 1D numpy array: index referring to 
+#      ith individual in population, and value referring 
+#      to the fitness score.'''
+
+
+#   return fit_score
 
 def fitness(population, n):
 
   '''calculates the fitness score of each
-     of the individuals in the population'''
-     
-  fit_score = [] # list to contain fitness score of each individuals
-  j = 0
-  while j < len(population):  # repeating for each individual
-    attacking_pairs = 0     #total number of attacking queen pairs
-    diagonal_pairs = 0  #no. of diagonal pairs
-    for i,val in enumerate(population[j]):    # i = index of individual list , val = individual position
-      attacking_pairs += math.comb(population[j].count(val),2) #finding no. of horizontal attacking pairs, using nC2 combination formula
-      
-      if i!=j:
-        if abs(i-j) == abs(population[i]-population[j]):  #finding no. of diagonal attacking pairs
-          diagonal_pairs += 1
-    if diagonal_pairs!=0:     #dealing with duplicate values
-      diagonal_pairs = diagonal_pairs/2
-    fit_score.append(attacking_pairs+diagonal_pairs) 
-    j += 1
-    
+     of the individuals in the population
 
-  '''returns a 1D numpy array: index referring to 
+     returns a 1D numpy array: index referring to 
      ith individual in population, and value referring 
      to the fitness score.'''
 
+  fitness_list=[] 
+  for i in range( len(population) ):#0-9
+      totpair=0 #total attacking pairs
+      state=population[i]#1st row, is a list
 
-  return fit_score
+      #calculating horizontal pairs
+      hor_pair=len(state)-len( np.unique(state) )
+      totpair+=hor_pair
+
+      #there will be no vertical attacking pairs
+      #calculating diagonal attacking pairs
+      diagpair=0 
+      for s in range(len(state)):#0-7
+          for t in range(len(state)):#0-7
+              if s!=t:
+                  temp1=abs(s-t)
+                  temp2=abs(state[s]-state[t])
+                  if temp1==temp2:
+                      diagpair+=1
+
+      diagpair=int(diagpair/2)
+
+      totpair+=int(diagpair)
+      fitness_list.append(totpair)
+
+  return np.array(fitness_list)
 
 """### Random Selection function
 
@@ -124,15 +162,22 @@ def select(population, fit):
 """
 
 def crossover(x, y):
-  '''take input: 2 parents - x, y. 
-     Generate a random crossover point. 
-     Append first half of x with second 
+  '''take input: 2 parents - x, y.
+     Generate a random crossover point.
+     Append first half of x with second
      half of y to create the child'''
-     
+  n = random.randint(1,10)  #gives a random value between 1-10
+
+  #print(n)
+
+  xtemp = x[:n]    #slices the list 0-n
+  ytemp = y[n:]    #slices the list n-end
+  x2 = xtemp + ytemp  #new gen individual is formed
+
   '''returns: a child chromosome'''
 
-     
-  return
+
+  return x2
 
 """###Mutation function"""
 
@@ -142,9 +187,12 @@ def mutate(child):
      gene into another random gene
      
      returns: mutated child'''
-  
 
-  return
+  i = random.randint(0,len(child)-1)
+  j = random.randint(0,8)
+  child[i] = j     
+
+  return child
 
 """### Genetic Algorithm Function"""
 
@@ -152,35 +200,38 @@ def GA(population, n, mutation_threshold = 0.3):
   '''implement the pseudocode here by
      calling the necessary functions- Fitness, 
      Selection, Crossover and Mutation'''
-     fn = fitness(population, n)
-     nmax = 10000
-     nm = nmax
-     while nm < 0 :
-       new_pop = []
-       j=0
-       for i in population[j]:
-         x = select(population, fn)
-         y = select(population, fn)
+  fn = fitness(population, n)
+  fn2 = fn
+  nmax = 10000
+  nm = nmax
+  while nm < 0 :
+    new_pop = []
+    j=0
+    for i in population[j]:
+      x = select(population, fn)
+      y = select(population, fn)
 
-         child =  crossover(x,y)
-         rando = random.uniform(0, 1)
-         if(rando < mutation_threshold):
-           mutant = mutate(child)
-           new_pop.append(mutant)
-       population = new_pop
-       j += 1
-     nm -= 1
-     fn2 = fitness(population, n)
-     if 28 in fn2: break  
+      child =  crossover(x,y)
+      rando = random.uniform(0, 1)
+      if(rando < mutation_threshold):
+        mutant = mutate(child)
+        new_pop.append(mutant)
+    population = new_pop
+    j += 1
+    fn2 = fitness(population, n)
+    if 28 in fn2: break
+  nm -= 1
+  
+    
 
 
   '''print: the max fitness value and the 
      chromosome that generated it which is ultimately 
      the solution board'''
-     for i in fn2:
-       if i==28
-        print(population[fn2.index(28)])
-        break
+  for i in fn2:
+    if i==28:
+      print(population[fn2.index(28)])
+    break
 
 
 
